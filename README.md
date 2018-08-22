@@ -1,1 +1,1 @@
-# This is a dashboard for the Salt Lake County Homelessness Pay For Success (PFS) Program: Homes Not Jails (HNJ)
+# This is a dashboard for the Salt Lake County Homelessness Pay For Success (PFS) Program: Homes Not Jails (HNJ).
