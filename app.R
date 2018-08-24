@@ -1,3 +1,4 @@
+library(googlesheets)
 library(plotly)
 library(shiny)
 library(shinythemes)
@@ -91,4 +92,53 @@ ui <- fluidPage(theme = shinytheme("journal"),
                            ),
                            tabPanel("Employment",
                                     h3("Employment"),
-                                    
+                                      h4("Employment Assessments Conuducted"),
+                                        plotlyOutput("EmploymentAssessmentsPlot"),
+                                      h4("Participants Enrolled in Employment Services"),
+                                        plotlyOutput("EmploymentServicesPlot"),
+                                      h4("Participants with a Source of Income"),
+                                        plotlyOutput("SourceOfIncomePlot")
+                           ),
+                           tabPanel("Staffing",
+                                    h3("Staffing"),
+                                      h4("Staff to Client Ratio"),
+                                        plotlyOutput("StaffClientRatioPlot"),
+                                      h4("Positions Available vs Positions Filled"),
+                                        plotlyOutput("PositionsRatio")
+                           ),
+                           tabPanel("Exits",
+                                    h3("Exits"),
+                                      h4("Clients that Lost Housing"),
+                                        plotlyOutput("ClientsLostHousingPlot"),
+                                      h4("Unplanned Exits this Month"),
+                                        plotlyOutput("UnplannedExitsPlot"),
+                                      h4("Graduations from the Program"),
+                                        plotlyOutput("GraduationsPlot")
+                           ),
+                           tabPanel("Financial",
+                                    h3("Financial"),
+                                      h4("Program Expenditures to Date"),
+                                        plotlyOutput("ExpendituresToDate")
+                           )
+                           
+                           ),
+                
+                HTML('<center><img src="footer.jpg"></center>')
+                
+)
+
+#DefineServer
+server <- function(input, output) {
+  ax <- list(
+    title = 'Month',
+    zeroline = T,
+    showline = T,
+    zerolinewidth = 1,
+    zerolinecolor = to RGB("white")
+)
+  
+gap <- gs_title("HNJ Service Provider Report_Updated")
+mydata <- gap %>%
+  gs_read()
+
+#Wrangling
