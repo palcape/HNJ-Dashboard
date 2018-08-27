@@ -4,7 +4,7 @@ library(shiny)
 library(shinythemes)
 
 
-#Define UI
+# Define UI
 ui <- fluidPage(theme = shinytheme("journal"),
                 navbarPage("SLC HNJ Dashboard",
                            tabPanel("Dashboard",
@@ -127,18 +127,25 @@ ui <- fluidPage(theme = shinytheme("journal"),
                 
 )
 
-#DefineServer
+# Define Server
 server <- function(input, output) {
   ax <- list(
     title = 'Month',
     zeroline = T,
     showline = T,
     zerolinewidth = 1,
-    zerolinecolor = to RGB("white")
+    zerolinecolor = toRGB("white")
 )
   
 gap <- gs_title("HNJ Service Provider Report_Updated")
-mydata <- gap %>%
+myData <- gap %>%
   gs_read()
 
-#Wrangling
+## Wrangling
+
+# Transpose data
+tData <- t(myData)
+
+# Clean up Columns
+colnames(tData) = tData[1, ] # Assigns first row column names
+tData = tData[-1, ] # Deletes first column
