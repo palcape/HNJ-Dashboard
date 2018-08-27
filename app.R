@@ -145,7 +145,3 @@ myData <- gap %>%
 
 # Transpose data
 tData <- t(myData)
-
-# Clean up Columns
-colnames(tData) = tData[1, ] # Assigns first row column names
-tData = tData[-1, ] # Deletes first column
