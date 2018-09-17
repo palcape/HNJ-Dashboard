@@ -2,6 +2,7 @@ library(googlesheets)
 library(plotly)
 library(shiny)
 library(shinythemes)
+library(tidyverse)
 
 
 # Define UI
@@ -137,11 +138,32 @@ server <- function(input, output) {
     zerolinecolor = toRGB("white")
 )
   
+# Import Data
 gap <- gs_title("HNJ Service Provider Report_Updated")
 myData <- gap %>%
-  gs_read()
+  gs_read(col_names = F)
 
 ## Wrangling
 
-# Transpose data
-tData <- t(myData)
+  # Transpose Data
+  tData <- t(myData) # transposes the data
+  tData <- as.tibble(tData) # transforms the data into a dataframe
+
+  # Clean up Columns
+  tData <- tData[ ,-c(2, 7, 30, 57, 70, 78, 82, 85, 97)] # removes header columns
+  tData <- tData[ ,-c(6, 10, 15, 24, 60)] # removes subheader columns
+  tData <- tData[-1, ] # removes the first row from the dataset
+  colnames(tData) = tData[1, ] # assigns column names to the first row
+  
+  # Clean up Rows
+  tData <- tData[-c(1, 4, 8, 12, 16, 18, 19, 20, 21), ] # removes quarterly total and duplicate rows
+  
+  has_rownames(tData)
+  
+  rownames(tData) <- tData[ ,1]
+  rownames(tData) <-tData[ ,1] # assigns column names from the first row
+  
+
+
+tData <- tData %>% 
+  slice(-1)
