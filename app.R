@@ -1,12 +1,13 @@
+# Load Packages
 library(googlesheets)
 library(plotly)
 library(shiny)
 library(shinythemes)
-library(tidyverse)
+library(tibble)
 
 
 # Define UI
-ui <- fluidPage(theme = shinytheme("journal"),
+ui <- fluidPage(theme = shinytheme("superhero"),
                 navbarPage("SLC HNJ Dashboard",
                            tabPanel("Dashboard",
                                     h3("Dashboard Overview"),
@@ -121,11 +122,8 @@ ui <- fluidPage(theme = shinytheme("journal"),
                                       h4("Program Expenditures to Date"),
                                         plotlyOutput("ExpendituresToDate")
                            )
-                           
                            ),
-                
                 HTML('<center><img src="footer.jpg"></center>')
-                
 )
 
 # Define Server
@@ -136,34 +134,27 @@ server <- function(input, output) {
     showline = T,
     zerolinewidth = 1,
     zerolinecolor = toRGB("white")
-)
+  )
   
-# Import Data
-gap <- gs_title("HNJ Service Provider Report_Updated")
-myData <- gap %>%
+  # Import Data
+  gap <- gs_title("HNJ Service Provider Report_Updated")
+  myData <- gap %>%
   gs_read(col_names = F)
 
-## Wrangling
+  # Wrangling
+    # Transpose Data
+    tData <- t(myData) # transposes the data
+    tData <- as.tibble(tData) # transforms the data into a dataframe
 
-  # Transpose Data
-  tData <- t(myData) # transposes the data
-  tData <- as.tibble(tData) # transforms the data into a dataframe
+    # Clean up Columns
+    tData <- tData[ ,-c(2, 7, 30, 57, 70, 78, 82, 85, 97)] # removes header columns
+    tData <- tData[ ,-c(6, 10, 15, 24, 60)] # removes subheader columns
+    tData <- tData[-1, ] # removes the first row from the dataset
+    colnames(tData) = tData[1, ] # assigns column names to the first row
+  
+    # Clean up Rows
+    tData <- tData[-c(1, 4, 8, 12, 16, 18, 19, 20, 21), ] # removes quarterly total and duplicate rows
+}
 
-  # Clean up Columns
-  tData <- tData[ ,-c(2, 7, 30, 57, 70, 78, 82, 85, 97)] # removes header columns
-  tData <- tData[ ,-c(6, 10, 15, 24, 60)] # removes subheader columns
-  tData <- tData[-1, ] # removes the first row from the dataset
-  colnames(tData) = tData[1, ] # assigns column names to the first row
-  
-  # Clean up Rows
-  tData <- tData[-c(1, 4, 8, 12, 16, 18, 19, 20, 21), ] # removes quarterly total and duplicate rows
-  
-  has_rownames(tData)
-  
-  rownames(tData) <- tData[ ,1]
-  rownames(tData) <-tData[ ,1] # assigns column names from the first row
-  
-
-
-tData <- tData %>% 
-  slice(-1)
+# Run App
+shinyApp(ui, server)
