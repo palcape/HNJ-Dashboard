@@ -1,9 +1,8 @@
 # Load Packages
 library(googlesheets)
-library(plotly)
 library(shiny)
 library(shinythemes)
-library(tibble)
+library(tidyverse)
 
 
 # Define UI
@@ -136,24 +135,20 @@ server <- function(input, output) {
     zerolinecolor = toRGB("white")
   )
   
-  # Import Data
+  ## Import Data
   gap <- gs_title("HNJ Service Provider Report_Updated")
   myData <- gap %>%
-  gs_read(col_names = F)
+    gs_read()
 
-  # Wrangling
-    # Transpose Data
+  ## Wrangling
     tData <- t(myData) # transposes the data
-    tData <- as.tibble(tData) # transforms the data into a dataframe
+    tData <- as.data.frame(tData) # transforms the data into a dataframe
+    tData <- tData[ ,-c(1, 6, 29, 56, 69, 77, 81, 84, 96)] # removes header columns
+    tData <- tData[ ,-c(7, 11, 16, 24, 25, 28, 63)] # removes subheader columns
+    colnames(tData) <- as.character(unlist(tData[2,])) # assigns column names to second row
+    tData <- tData[-c(1, 2, 5, 9, 13, 17, 19, 20, 21, 22), ] # removes quarterly total and duplicate rows
+    xaxis <- rownames(tData) # assigns row names to a vector we can use in our graph
 
-    # Clean up Columns
-    tData <- tData[ ,-c(2, 7, 30, 57, 70, 78, 82, 85, 97)] # removes header columns
-    tData <- tData[ ,-c(6, 10, 15, 24, 60)] # removes subheader columns
-    tData <- tData[-1, ] # removes the first row from the dataset
-    colnames(tData) = tData[1, ] # assigns column names to the first row
-  
-    # Clean up Rows
-    tData <- tData[-c(1, 4, 8, 12, 16, 18, 19, 20, 21), ] # removes quarterly total and duplicate rows
 }
 
 # Run App
