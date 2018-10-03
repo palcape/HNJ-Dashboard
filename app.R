@@ -11,26 +11,27 @@ ui <- fluidPage(theme = shinytheme("superhero"),
                 navbarPage("SLC HNJ Dashboard",
                            tabPanel("Dashboard",
                                     h3("Dashboard Overview"),
-                                    p("Welome to the HNJ Dashboard. This dashboard is designed to allow you to explore the data related to the SLCO-HNJ project. Click 
+                                      p("Welome to the HNJ Dashboard. This dashboard is designed to allow you to explore the data related to the SLCO-HNJ project. Click 
                                       on the Category Bar at the top of the screen to see different categories of data. Once you've
                                       found a plot you like, you can use its interactive features to explore your data. Double click a series
                                       on the legend to isolate the plot to that one data series!")
                            ),
                            tabPanel("Program Overview",
                                     h3("Program Overview"),
-                                    plotlyOutput("ProgramOverviewPlot"),
-                                    h3("Client Information"),
-                                    h4("Age"),
-                                    plotlyOutput("AgesLinePlot"),
-                                    h4("Race/Ethnicity"),
-                                    plotlyOutput("raceLinePlot")
+                                      plotlyOutput("ProgramOverviewPlot"),
+                                    h3("Client Demographics"),
+                                      h4("Age"),
+                                        plotlyOutput("AgesLinePlot"),
+                                      h4("Race/Ethnicity"),
+                                        plotlyOutput("RaceLinePlot")
                            ),
-                           tabPanel("Referrals and Randomization",
-                                    h3("Referrals and Randomization"),
-                                    h4("Randomized into REACH from Jail"),
-                                    plotlyOutput("randomizedBarPlot"),
-                                    h4("Days Between Randomization and Enrollment"),
-                                    plotlyOutput("betweenEnrollmentdBarPlot"),
+                           tabPanel("Referrals and Enrollments",
+                                    h3("Referrals and Enrollments"),
+                                      h4("Eligible per HMIS Data Pull"),
+                                      plotlyOutput("HMISplot"),
+                                    h3("TRH Location Endeavors"),
+                                      h4("TRH Location Endeavors"),
+                                      plotlyOutput("TRHplot"),
                                     h4("Contacts Between Randomization and Enrollment"),
                                     plotlyOutput("contactsBetweenEnrollmentdBarPlot"),
                                     h4("Number of REACH Assessments Conducted"),
@@ -120,8 +121,7 @@ server <- function(input, output) {
   ## Wrangling
     tData <- t(myData) # transposes the data
     tData <- as.data.frame(tData) # transforms the data into a dataframe
-    tData <- tData[ ,-c(1, 6, 29, 56, 69, 77, 81, 84, 96)] # removes header columns
-    tData <- tData[ ,-c(7, 11, 16, 24, 25, 28, 63)] # removes subheader columns
+    tData <- tData[ ,-c(1, 6, 7, 11, 16, 25, 29, 56, 63, 69, 77, 81, 84, 96)] # removes header columns
     colnames(tData) <- as.character(unlist(tData[2,])) # assigns column names to second row
     tData <- tData[-c(1, 2, 5, 9, 13, 16, 17, 18, 19, 20, 21, 22), ] # removes quarterly total and duplicate rows
     xaxis <- rownames(tData) # assigns row names to a vector we can use in our graph
@@ -131,52 +131,42 @@ server <- function(input, output) {
   ## Graphics
     ### Program Overview
       #### Program Overview
-      output$ProgramOverviewPlot <- renderPlotly({ProgramOverviewPlot <- plot_ly(x = months, y = strtoi(tData[,2]), type = 'scatter', mode = 'lines+markers')  %>%
-        add_trace(y = strtoi(tData[ ,1]), name = 'New Clients', mode = 'lines+markers') %>%
-        add_trace(y = strtoi(tData[ ,2]), name = 'Total Clients', mode = 'lines+markers') %>%
-        add_trace(y = strtoi(tData[ ,3]), name = 'Clients Housed', mode = 'lines+markers') %>%
-        add_trace(y = strtoi(tData[ ,4]), name = 'Clients Permanently Housed', mode = 'lines+markers') %>%
-        layout(yaxis = list(title = 'Number of Individuals', rangemode = "tozero"), xaxis = ax)
-      })
-      
-      #### Client Information 
-      output$AgesLinePlot <- renderPlotly({AgesLinePlot <- plot_ly(x = months, y = strtoi(tData[,11]), name = '18-25', type = 'scatter', mode = 'lines+markers')  %>%
-        #Plot Number of individuals referred to REACH this month
-        add_trace(y = strtoi(tData[,12]), name = '26-35', mode = 'lines+markers') %>%
-        #Plot Number of new clients enrolled in REACH this month
-        add_trace(y = strtoi(tData[,13]), name = '35-44', mode = 'lines+markers') %>%
-        #Plot Number of REACH clients actively receiving services
-        add_trace(y = strtoi(tData[,14]), name = '45+', mode = 'lines+markers')%>%
-        layout(yaxis = list(title = 'Number of Individuals', rangemode = "tozero"), xaxis = list(title = 'Month'))
-      })
-    
-    #Plot Race as Line Graph
-    output$raceLinePlot <- renderPlotly({ raceLinePlot <- plot_ly(x = months, y = strtoi(tData[,15]), name = 'American Indian', type = 'scatter', mode = 'lines+markers')  %>%
-      #Plot Number of individuals referred to REACH this month
-      add_trace(y = strtoi(tData[,16]), name = 'Asian', mode = 'lines+markers') %>%
-      #Plot Number of new clients enrolled in REACH this month
-      add_trace(y = strtoi(tData[,17]), name = 'Black/African American', mode = 'lines+markers') %>%
-      #Plot Number of REACH clients actively receiving services
-      add_trace(y = strtoi(tData[,18]), name = 'Black/African American, White', mode = 'lines+markers')%>%
-      add_trace(y = strtoi(tData[,19]), name = 'Pacific Islander', mode = 'lines+markers')%>%
-      add_trace(y = strtoi(tData[,20]), name = 'Other: Single race', mode = 'lines+markers')%>%
-      add_trace(y = strtoi(tData[,21]), name = 'Other: Two or more races', mode = 'lines+markers')%>%
-      add_trace(y = strtoi(tData[,22]), name = 'White', mode = 'lines+markers')%>%
-      add_trace(y = strtoi(tData[,23]), name = 'Mexican', mode = 'lines+markers')%>%
-      add_trace(y = strtoi(tData[,24]), name = 'Not of Hispanic Origin', mode = 'lines+markers')%>%
-      add_trace(y = strtoi(tData[,25]), name = 'Other: Hispanic', mode = 'lines+markers')%>%
-      add_trace(y = strtoi(tData[,26]), name = 'Puerto Rican', mode = 'lines+markers')%>%
-      layout(yaxis = list(title = 'Number of Individuals', rangemode = "tozero"), xaxis = list(title = 'Month'))
-    })
-    
-    # Referrals and Randomization 
-    output$randomizedBarPlot <- renderPlotly({randomizedBarPlot <- plot_ly(x = months, y = strtoi(tData[,27]), type = 'bar', name = 'Randomized into REACH') %>%
-      layout(yaxis = list(title = 'Number of Individuals Randomized into REACH', rangemode = "tozero"), xaxis = list(title = 'Month'))
-    })
-    
-    output$betweenEnrollmentdBarPlot <- renderPlotly({betweenEnrollmentdBarPlot <- plot_ly(x = months, y = as.double(tData[,28]), type = 'bar', name = 'Randomized into REACH') %>%
-      layout(yaxis = list(title = 'Avg. Days from Randomization to Enrollment'), xaxis = list(title = 'Month'))
-    })
+        ##### Program Overview
+        output$ProgramOverviewPlot <- renderPlotly({ProgramOverviewPlot <- plot_ly(x = months, y = strtoi(tData[ ,1]), name = 'New Clients', type = 'scatter', mode = 'lines+markers')  %>%
+          add_trace(y = strtoi(tData[ ,2]), name = 'Total Clients', mode = 'lines+markers') %>%
+          add_trace(y = strtoi(tData[ ,3]), name = 'Clients Housed', mode = 'lines+markers') %>%
+          add_trace(y = strtoi(tData[ ,4]), name = 'Clients Permanently Housed', mode = 'lines+markers') %>%
+          layout(yaxis = list(title = 'Number of Individuals', rangemode = "tozero"), xaxis = ax)
+        })
+      #### Client Demographics
+        ##### Client Age 
+        output$AgesLinePlot <- renderPlotly({AgesLinePlot <- plot_ly(x = months, y = strtoi(tData[ ,9]), name = '26-35', type = 'scatter', mode = 'lines+markers')  %>%
+          add_trace(y = strtoi(tData[ ,10]), name = '36-45', mode = 'lines+markers')%>%
+          add_trace(y = strtoi(tData[ ,11]), name = '45+', mode = 'lines+markers')%>%
+          layout(yaxis = list(title = 'Number of Individuals', rangemode = "tozero"), xaxis = list(title = 'Month'))
+        })
+        ##### Client Race
+        output$RaceLinePlot <- renderPlotly({ RaceLinePlot <- plot_ly(x = months, y = strtoi(tData[ ,12]), name = 'American Indian', type = 'scatter', mode = 'lines+markers')  %>%
+          add_trace(y = strtoi(tData[,13]), name = 'Asian', mode = 'lines+markers') %>%
+          add_trace(y = strtoi(tData[,14]), name = 'Pacific Islander', mode = 'lines+markers') %>%
+          add_trace(y = strtoi(tData[,15]), name = 'Black/African American', mode = 'lines+markers')%>%
+          add_trace(y = strtoi(tData[,16]), name = 'White', mode = 'lines+markers')%>%
+          add_trace(y = strtoi(tData[,17]), name = 'Other: Two or more races', mode = 'lines+markers')%>%
+          add_trace(y = strtoi(tData[,20]), name = 'Hispanic', mode = 'lines+markers')%>%
+          add_trace(y = strtoi(tData[,21]), name = 'Other: Non-Hispanic', mode = 'lines+markers')%>%
+          layout(yaxis = list(title = 'Number of Individuals', rangemode = "tozero"), xaxis = list(title = 'Month'))
+        })
+    ### Referrals and Enrollment 
+      #### Eligible per HMIS Data Pull
+        ##### Eligible per HMIS Data Pull
+        output$HMISplot <- renderPlotly({HMISplot <- plot_ly(x = months, y = strtoi(tData[,23]), type = 'bar', name = 'Eligible per HMIS Data Pull') %>%
+          layout(yaxis = list(title = 'Number of Individuals', rangemode = "tozero"), xaxis = list(title = 'Month'))
+        })
+      #### TRH Location Endeavors
+        ##### TRH Location Endeavors
+        output$TRHplot <- renderPlotly({TRHplot <- plot_ly(x = months, y = as.double(tData[,28]), type = 'bar', name = 'Randomized into REACH') %>%
+          layout(yaxis = list(title = 'Avg. Days from Randomization to Enrollment'), xaxis = list(title = 'Month'))
+        })
     
     output$contactsBetweenEnrollmentdBarPlot <- renderPlotly({contactsBetweenEnrollmentdBarPlot <- plot_ly(x = months, y = as.double(tData[,29]), type = 'bar', name = 'Randomized into REACH') %>%
       layout(yaxis = list(title = 'Avg. Contacts from Randomization to Enrollment', rangemode = "tozero"), xaxis = list(title = 'Month'))
