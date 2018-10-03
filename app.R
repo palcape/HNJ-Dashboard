@@ -11,7 +11,6 @@ ui <- fluidPage(theme = shinytheme("superhero"),
                 navbarPage("SLC HNJ Dashboard",
                            tabPanel("Dashboard",
                                     h3("Dashboard Overview"),
-                                    
                                     p("Welome to the HNJ Dashboard. This dashboard is designed to allow you to explore the data related to the SLCO-HNJ project. Click 
                                       on the Category Bar at the top of the screen to see different categories of data. Once you've
                                       found a plot you like, you can use its interactive features to explore your data. Double click a series
@@ -19,113 +18,90 @@ ui <- fluidPage(theme = shinytheme("superhero"),
                            ),
                            tabPanel("Program Overview",
                                     h3("Program Overview"),
-                                        plotlyOutput("ProgramOverviewPlot"),
-                                    h3("Client Demographics"),
-                                      h4("Gender"),
-                                        plotlyOutput("GenderHistogram"),
-                                      h4("Age"),
-                                        plotlyOutput("AgeLineChart"),
-                                      h4("Race"),
-                                        plotlyOutput("RaceHistogram"),
-                                      h4("Ethnicity"),
-                                        plotlyOutput("EthnicityHistogram")
+                                    plotlyOutput("ProgramOverviewPlot"),
+                                    h3("Client Information"),
+                                    h4("Age"),
+                                    plotlyOutput("AgesLinePlot"),
+                                    h4("Race/Ethnicity"),
+                                    plotlyOutput("raceLinePlot")
                            ),
-                           tabPanel("Referrals and Enrollments",
-                                    h3("Referrals and Enrollments"),
-                                      h4("TRH Successfully Located"),
-                                        plotlyOutput("LocatedPlot"),
-                                      h4("Eligible for Prescreen"),
-                                        plotlyOutput("EligiblePrescreenPlot"),
-                                      h4("Ineligble for Prescreen"),
-                                        plotlyOutput("IneligiblePrescreenPlot"),
-                                      h4("Prescreens Completed"),
-                                        plotlyOutput("PrescreensCompletedPlot"),
-                                      h4("Identified as Eligible for Prescreen After This Month"),
-                                        plotlyOutput("IdentifiedAsEligiblePlot"),
-                                      h4("Identified as Ineligible for Prescreen After This Month"),
-                                        plotlyOutput("IdentifiedAsEligiblePlot"),
-                                      h4("Sent to UCJC for Randomization"),
-                                        plotlyOutput("UCJCPlot"),
-                                      h4("Randomized into HNJ"),
-                                        plotlyOutput("RandomizedIntoHNJPlot"),
-                                      h4("PendingApproval"),
-                                        plotlyOutput("PendingApprovalPlot"),
-                                      h4("Days Between Initial Outreach and Prescreen Completion"),
-                                        plotlyOutput("OutreachCompletionPlot"),
-                                      h4("Days Between Referral to Treatment Group and Engagement with HNJ"),
-                                        plotlyOutput("Engagement with HNJPlot"),
-                                      h4("Days Between Meeting with Housing Specialist and Housing Placement"),
-                                        plotlyOutput("HousingPlacementPlot")
-                           ),
-                           tabPanel("Housing Placement and Services",
-                                    h3("Housing Placement and Services"),
-                                      h4("Roommate Placement Assessments Conducted"),
-                                        plotlyOutput("RoommateTestsPlot"),
-                                      h4("New Placements into Housing"),
-                                        plotlyOutput("HousingPlacementsPlot"),
-                                      h4("Clients Awaiting Housing Placement"),
-                                        plotlyOutput("AwaitingHousingPlot"),
-                                      h4("Not Housed within Three Months of Enrollment"),
-                                        plotlyOutput("NotHousedPlot"),
-                                    h3("Rental Subsidies"),
-                                      h4("Clients Receiving Rental Subsidies"),
-                                        plotlyOutput("ReceivingSubsidiesPlot"),
-                                      h4("Single Placement Monthly Rent"),
-                                        plotlyOutput("MonthlyRentPlot"),
-                                      h4("Roommate Monthly Rent"),
-                                        plotlyOutput("RoommateRentPlot"),
-                                      h4("Length of HNJ Rental Subsidy (Months)"),
-                                        plotlyOutput("SubsidyLength"),
-                                      h4("Clients Receiving Non-Concurrent Rental Subsidy"),
-                                        plotlyOutput("NoncurrentSubsidyPlot")
-                           ),
-                           tabPanel("Behavioral Health",
-                                    h3("Behavioral Health"),
-                                      h4("Clients Referred to Behavioral Health Treatment"),
-                                        plotlyOutput("ReferredtoTreatmentPlot"),
-                                      h4("Behavioral Health Assessments Conducted"),
-                                        plotlyOutput("HealthAssessmentsPlot"),
-                                      h4("Clients Referred to Behavioral Health Treatment After Assessment"),
-                                        plotlyOutput("AfterAssessmentPlot"),
-                                      h4("Met with HNJ Clinician"),
-                                        plotlyOutput("MetWithClinicianPlot"),
-                                      h4("Enrolled in Additional Community Services"),
-                                        plotlyOutput("CommunityServicesPlot")
+                           tabPanel("Referrals and Randomization",
+                                    h3("Referrals and Randomization"),
+                                    h4("Randomized into REACH from Jail"),
+                                    plotlyOutput("randomizedBarPlot"),
+                                    h4("Days Between Randomization and Enrollment"),
+                                    plotlyOutput("betweenEnrollmentdBarPlot"),
+                                    h4("Contacts Between Randomization and Enrollment"),
+                                    plotlyOutput("contactsBetweenEnrollmentdBarPlot"),
+                                    h4("Number of REACH Assessments Conducted"),
+                                    plotlyOutput("assessmentsBarPlot")
+                           ), 
+                           tabPanel("Service Delivery",
+                                    h3("Service Delivery"),
+                                    h4("Number of Clients by Delivery Type"),
+                                    plotlyOutput("serviceDeliveryLinePlot"),
+                                    h4("Time Spent on Highest Needs of Client"),
+                                    plotlyOutput("highestNeedBarPlot") 
                            ),
                            tabPanel("Employment",
                                     h3("Employment"),
-                                      h4("Employment Assessments Conuducted"),
-                                        plotlyOutput("EmploymentAssessmentsPlot"),
-                                      h4("Participants Enrolled in Employment Services"),
-                                        plotlyOutput("EmploymentServicesPlot"),
-                                      h4("Participants with a Source of Income"),
-                                        plotlyOutput("SourceOfIncomePlot")
+                                    h4("Client Engagement"),
+                                    plotlyOutput("employmentLinePlot"), 
+                                    h4("Total Percent of Employment"),
+                                    plotlyOutput("employmentBarPlot")
+                           ),
+                           tabPanel("Housing",
+                                    h3("Housing"),
+                                    h4("Client Numbers"),
+                                    plotlyOutput("housingResidentLinePlot"), 
+                                    h4("Average Length of Stay"),
+                                    plotlyOutput("housingCapacityLinePlotLength"), 
+                                    h4("Bed Days Filled"),
+                                    plotlyOutput("bedDaysLinePlot")
+                           ),
+                           tabPanel("SUD Treatment",
+                                    h3("SUD Treatment"),
+                                    h4("SUD Numbers"),
+                                    plotlyOutput("SUDLinePlot"), 
+                                    h4("SUD hourly breakdown"),
+                                    plotlyOutput("SUDBarPlot"),
+                                    h3("UA Treatment"),
+                                    h4("UA Numbers"),
+                                    plotlyOutput("UALinePlot"),
+                                    h4("UA Breakdown"),
+                                    plotlyOutput("UASLinePlot")
+                           ),
+                           tabPanel("Recidivism",
+                                    h3("Recidivism"),
+                                    h4("Engagements Number"),
+                                    plotlyOutput("engagementsLinePlot"), 
+                                    h4("Contacts to disengaged individuals"),
+                                    plotlyOutput("engagementsMethodsLinePlot")
                            ),
                            tabPanel("Staffing",
                                     h3("Staffing"),
-                                      h4("Staff to Client Ratio"),
-                                        plotlyOutput("StaffClientRatioPlot"),
-                                      h4("Positions Available vs Positions Filled"),
-                                        plotlyOutput("PositionsRatio")
+                                    plotlyOutput("staffingLinePlot")
+                           ),
+                           tabPanel("Fidelity and Training",
+                                    h3("Fidelity and Training"),
+                                    plotlyOutput("fidelityScoreLinePlot") 
                            ),
                            tabPanel("Exits",
                                     h3("Exits"),
-                                      h4("Clients that Lost Housing"),
-                                        plotlyOutput("ClientsLostHousingPlot"),
-                                      h4("Unplanned Exits this Month"),
-                                        plotlyOutput("UnplannedExitsPlot"),
-                                      h4("Graduations from the Program"),
-                                        plotlyOutput("GraduationsPlot")
+                                    h4("Number of Exits"),
+                                    plotlyOutput("exitLinePlot"),
+                                    h4("Overall Attrition"),
+                                    plotlyOutput("exitAttritionLinePlot")
                            ),
                            tabPanel("Financial",
-                                    h3("Financial"),
-                                      h4("Program Expenditures to Date"),
-                                        plotlyOutput("ExpendituresToDate")
+                                    h3("Financial Data"),
+                                    plotlyOutput("financesLinePlot")
                            )
-                           ),
+                           
+                ),
+                
                 HTML('<center><img src="footer.jpg"></center>')
 )
-
 # Define Server
 server <- function(input, output) {
   ax <- list(
@@ -147,38 +123,32 @@ server <- function(input, output) {
     tData <- tData[ ,-c(1, 6, 29, 56, 69, 77, 81, 84, 96)] # removes header columns
     tData <- tData[ ,-c(7, 11, 16, 24, 25, 28, 63)] # removes subheader columns
     colnames(tData) <- as.character(unlist(tData[2,])) # assigns column names to second row
-    tData <- tData[-c(1, 2, 5, 9, 13, 17, 19, 20, 21, 22), ] # removes quarterly total and duplicate rows
+    tData <- tData[-c(1, 2, 5, 9, 13, 16, 17, 18, 19, 20, 21, 22), ] # removes quarterly total and duplicate rows
     xaxis <- rownames(tData) # assigns row names to a vector we can use in our graph
-
-  ## Plot Program Overview
-    ## Plot Number of individuals randomized into REACH this month via line graph
-    months <- factor(xaxis,levels = c("January", "February", "March",  "April",   "May",  "June", "July", "August",  "September", "October", "November",  "December"))
+    months <- factor(xaxis,levels = c("November", "December", "January",  "February", "March",  "April", "May", "June",  "July", "August"))
     
-    ## Plot Program Overview: 
-    output$programOverviewPlot <- renderPlotly({programOverviewPlot <- plot_ly(x = months, y = strtoi(tData[,1]), name = 'Randomized', type = 'scatter', mode = 'lines+markers')  %>%
-      #Plot Number of individuals referred to REACH this month
-      add_trace(y = strtoi(tData[,2]), name = 'Referred', mode = 'lines+markers') %>%
-      #Plot Number of new clients enrolled in REACH this month
-      add_trace(y = strtoi(tData[,3]), name = 'New Clients', mode = 'lines+markers') %>%
-      #Plot Number of REACH clients actively receiving services
-      add_trace(y = strtoi(tData[,4]), name = 'Receiving Services', mode = 'lines+markers') %>%
-      #Plot Total number of individuals enrolled in REACH 
-      add_trace(y = strtoi(tData[,5]), name = 'Total Enrolled', mode = 'lines+markers') %>%
-      add_trace(y = strtoi(tData[,9]), name = 'Completed REACH', mode = 'lines+markers')%>%
-      layout(yaxis = list(title = 'Number of Individuals', rangemode = "tozero"), xaxis = ax)
-    })
-    
-    # Client Information 
-    # Plot Client Information as Line Graph
-    output$agesLinePlot <- renderPlotly({agesLinePlot <- plot_ly(x = months, y = strtoi(tData[,11]), name = '18-25', type = 'scatter', mode = 'lines+markers')  %>%
-      #Plot Number of individuals referred to REACH this month
-      add_trace(y = strtoi(tData[,12]), name = '26-35', mode = 'lines+markers') %>%
-      #Plot Number of new clients enrolled in REACH this month
-      add_trace(y = strtoi(tData[,13]), name = '35-44', mode = 'lines+markers') %>%
-      #Plot Number of REACH clients actively receiving services
-      add_trace(y = strtoi(tData[,14]), name = '45+', mode = 'lines+markers')%>%
-      layout(yaxis = list(title = 'Number of Individuals', rangemode = "tozero"), xaxis = list(title = 'Month'))
-    })
+  
+  ## Graphics
+    ### Program Overview
+      #### Program Overview
+      output$ProgramOverviewPlot <- renderPlotly({ProgramOverviewPlot <- plot_ly(x = months, y = strtoi(tData[,2]), type = 'scatter', mode = 'lines+markers')  %>%
+        add_trace(y = strtoi(tData[ ,1]), name = 'New Clients', mode = 'lines+markers') %>%
+        add_trace(y = strtoi(tData[ ,2]), name = 'Total Clients', mode = 'lines+markers') %>%
+        add_trace(y = strtoi(tData[ ,3]), name = 'Clients Housed', mode = 'lines+markers') %>%
+        add_trace(y = strtoi(tData[ ,4]), name = 'Clients Permanently Housed', mode = 'lines+markers') %>%
+        layout(yaxis = list(title = 'Number of Individuals', rangemode = "tozero"), xaxis = ax)
+      })
+      
+      #### Client Information 
+      output$AgesLinePlot <- renderPlotly({AgesLinePlot <- plot_ly(x = months, y = strtoi(tData[,11]), name = '18-25', type = 'scatter', mode = 'lines+markers')  %>%
+        #Plot Number of individuals referred to REACH this month
+        add_trace(y = strtoi(tData[,12]), name = '26-35', mode = 'lines+markers') %>%
+        #Plot Number of new clients enrolled in REACH this month
+        add_trace(y = strtoi(tData[,13]), name = '35-44', mode = 'lines+markers') %>%
+        #Plot Number of REACH clients actively receiving services
+        add_trace(y = strtoi(tData[,14]), name = '45+', mode = 'lines+markers')%>%
+        layout(yaxis = list(title = 'Number of Individuals', rangemode = "tozero"), xaxis = list(title = 'Month'))
+      })
     
     #Plot Race as Line Graph
     output$raceLinePlot <- renderPlotly({ raceLinePlot <- plot_ly(x = months, y = strtoi(tData[,15]), name = 'American Indian', type = 'scatter', mode = 'lines+markers')  %>%
@@ -328,6 +298,5 @@ server <- function(input, output) {
       layout(yaxis = list(title = 'Dollars ($)', rangemode = "tozero"), xaxis = list(title = 'Month', rangemode = "tozero"))
     })
 }
-
 # Run App
 shinyApp(ui, server)
