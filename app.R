@@ -29,11 +29,10 @@ ui <- fluidPage(theme = shinytheme("superhero"),
                                     h3("Referrals and Enrollments"),
                                       h4("Eligible per HMIS Data Pull"),
                                       plotlyOutput("HMISplot"),
-                                    h3("TRH Location Endeavors"),
                                       h4("TRH Location Endeavors"),
                                       plotlyOutput("TRHplot"),
-                                    h4("Contacts Between Randomization and Enrollment"),
-                                    plotlyOutput("contactsBetweenEnrollmentdBarPlot"),
+                                      h4("Prescreens"),
+                                      plotlyOutput("PrescreenPlot"),
                                     h4("Number of REACH Assessments Conducted"),
                                     plotlyOutput("assessmentsBarPlot")
                            ), 
@@ -125,7 +124,7 @@ server <- function(input, output) {
     colnames(tData) <- as.character(unlist(tData[2,])) # assigns column names to second row
     tData <- tData[-c(1, 2, 5, 9, 13, 16, 17, 18, 19, 20, 21, 22), ] # removes quarterly total and duplicate rows
     xaxis <- rownames(tData) # assigns row names to a vector we can use in our graph
-    months <- factor(xaxis,levels = c("November", "December", "January",  "February", "March",  "April", "May", "June",  "July", "August"))
+    months <- factor(xaxis,levels = c("October", "November", "December", "January",  "February", "March",  "April", "May", "June",  "July", "August"))
     
   
   ## Graphics
@@ -164,11 +163,12 @@ server <- function(input, output) {
         })
       #### TRH Location Endeavors
         ##### TRH Location Endeavors
-        output$TRHplot <- renderPlotly({TRHplot <- plot_ly(x = months, y = as.double(tData[,28]), type = 'bar', name = 'Randomized into REACH') %>%
-          layout(yaxis = list(title = 'Avg. Days from Randomization to Enrollment'), xaxis = list(title = 'Month'))
+        output$TRHplot <- renderPlotly({TRHplot <- plot_ly(x = months, y = strtoi(tData[ ,24]), name = 'TRH Attempted to Locate', type = 'scatter', mode = 'lines+markers') %>%
+          add_trace(y = strtoi(tData[ ,25]), name = 'TRH Located', mode = 'lines+markers') %>%
+        layout(yaxis = list(title = 'Number of Individuals'), xaxis = list(title = 'Month'))
         })
-    
-    output$contactsBetweenEnrollmentdBarPlot <- renderPlotly({contactsBetweenEnrollmentdBarPlot <- plot_ly(x = months, y = as.double(tData[,29]), type = 'bar', name = 'Randomized into REACH') %>%
+      #### Prescreen 
+      output$PrescreenPlot <- renderPlotly({PrescreenPlot <- plot_ly(x = months, y = strtoi(tData[,29]), type = 'bar', name = 'Randomized into REACH') %>%
       layout(yaxis = list(title = 'Avg. Contacts from Randomization to Enrollment', rangemode = "tozero"), xaxis = list(title = 'Month'))
     })
     output$assessmentsBarPlot <- renderPlotly({assessmentsBarPlot <- plot_ly(x = months, y = strtoi(tData[,30]), type = 'bar', name = 'Randomized into REACH') %>%
