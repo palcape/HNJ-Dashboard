@@ -14,12 +14,15 @@ ui <- fluidPage(theme = shinytheme("superhero"),
                                       p("Welome to the HNJ Dashboard. This dashboard is designed to allow you to explore the data related to the SLCO-HNJ project. Click 
                                       on the Category Bar at the top of the screen to see different categories of data. Once you've
                                       found a plot you like, you can use its interactive features to explore your data. Double click a series
-                                      on the legend to isolate the plot to that one data series!")
+                                      on the legend to isolate the plot to that one data series.")
                            ),
                            tabPanel("Program Overview",
-                                    h3("Program Overview"),
-                                      plotlyOutput("ProgramOverviewPlot"),
-                                    h3("Client Demographics"),
+                                      h4("Program Overview"),
+                                        plotlyOutput("ProgramOverviewPlot")
+                           ),
+                           tabPanel("Client Demographics",        
+                                      h4("Gender"),
+                                        plotlyOutput("GenderPlot"),
                                       h4("Age"),
                                         plotlyOutput("AgesLinePlot"),
                                       h4("Race/Ethnicity"),
@@ -31,7 +34,7 @@ ui <- fluidPage(theme = shinytheme("superhero"),
                                         plotlyOutput("HMISplot"),
                                       h4("TRH Location Endeavors"),
                                         plotlyOutput("TRHplot"),
-                                      h4("Prescreens"),
+                                      h4("Prescreen Eligibility"),
                                         plotlyOutput("PrescreenPlot")
                            ), 
                            tabPanel("Housing Placement and Services",
@@ -72,12 +75,7 @@ ui <- fluidPage(theme = shinytheme("superhero"),
                                         plotlyOutput("UEtMplot"),
                                       h4("Planned Graduations"),
                                         plotlyOutput("PGplot")
-                           ),
-                           tabPanel("Financial",
-                                    h3("Financial Data"),
-                                    plotlyOutput("financesLinePlot")
                            )
-                           
                 ),
                 
                 HTML('<center><img src="footer.jpg"></center>')
@@ -118,21 +116,21 @@ server <- function(input, output) {
   ## Graphics
     ### Program Overview
       #### Program Overview
-        ##### Program Overview
         output$ProgramOverviewPlot <- renderPlotly({ProgramOverviewPlot <- plot_ly(x = months, y = strtoi(tData[ ,1]), name = 'New Clients', type = 'scatter', mode = 'lines+markers')  %>%
           add_trace(y = strtoi(tData[ ,2]), name = 'Total Clients', mode = 'lines+markers') %>%
           add_trace(y = strtoi(tData[ ,3]), name = 'Clients Housed', mode = 'lines+markers') %>%
           add_trace(y = strtoi(tData[ ,4]), name = 'Clients Permanently Housed', mode = 'lines+markers') %>%
           layout(yaxis = list(title = 'Number of Individuals', rangemode = "tozero"), xaxis = ax)
         })
-      #### Client Demographics
-        ##### Client Age 
+    ### Client Demographics
+      #### Gender
+      #### Age 
         output$AgesLinePlot <- renderPlotly({AgesLinePlot <- plot_ly(x = months, y = strtoi(tData[ ,9]), name = '26-35', type = 'scatter', mode = 'lines+markers')  %>%
           add_trace(y = strtoi(tData[ ,10]), name = '36-45', mode = 'lines+markers')%>%
           add_trace(y = strtoi(tData[ ,11]), name = '45+', mode = 'lines+markers')%>%
           layout(yaxis = list(title = 'Number of Individuals', rangemode = "tozero"), xaxis = list(title = 'Month'))
         })
-        ##### Client Race
+      #### Race
         output$RaceLinePlot <- renderPlotly({ RaceLinePlot <- plot_ly(x = months, y = strtoi(tData[ ,12]), name = 'American Indian', type = 'scatter', mode = 'lines+markers')  %>%
           add_trace(y = strtoi(tData[,13]), name = 'Asian', mode = 'lines+markers') %>%
           add_trace(y = strtoi(tData[,14]), name = 'Pacific Islander', mode = 'lines+markers') %>%
@@ -155,10 +153,11 @@ server <- function(input, output) {
           add_trace(y = strtoi(tData[ ,25]), name = 'Located and Prescreened', mode = 'lines+markers') %>%
         layout(yaxis = list(title = 'Number of Individuals'), xaxis = list(title = 'Month'))
         })
-      #### Prescreen
-        ##### Prescreen
-        output$PrescreenPlot <- renderPlotly({PrescreenPlot <- plot_ly(x = months, y = strtoi(tData[,26]), type = 'bar', name = 'Eligible for Prescreen') %>%
-        layout(yaxis = list(title = 'Individuals Eligible for Prescreen', rangemode = "tozero"), xaxis = list(title = 'Month'))
+      #### Prescreen Eligibility
+        ##### Eligible for Prescreen
+        output$PrescreenPlot <- renderPlotly({PrescreenPlot <- plot_ly(x = months, y = strtoi(tData[ ,33]), name = 'Eligible after Prescreen', type = 'scatter', mode = 'lines+markers') %>%
+          add_trace(y = strtoi(tData[ ,34]), name = 'Ineligible after Prescreen', mode = 'lines+markers') %>%
+          layout(yaxis = list(title = 'Number of Individuals'), xaxis = list(title = 'Month'))
         })
         
     ### Housing Placement and Services
@@ -236,11 +235,6 @@ server <- function(input, output) {
       output$PGplot <- renderPlotly({PGplot <- plot_ly(x = months, y = strtoi(tData[,82]), type = 'bar', name = 'Planned Graduations') %>%
         layout(yaxis = list(title = 'Number of Individuals', rangemode = "tozero"), xaxis = list(title = 'Month'))
       })
-    
-    #Finances
-    output$financesLinePlot <- renderPlotly({financesLinePlot <- plot_ly(x = months, y = as.double(tData[,83]), name = 'Finances', type = 'scatter', mode = 'lines+markers')  %>%
-      layout(yaxis = list(title = 'Dollars ($)', rangemode = "tozero"), xaxis = list(title = 'Month', rangemode = "tozero"))
-    })
 }
 # Run App
 shinyApp(ui, server)
