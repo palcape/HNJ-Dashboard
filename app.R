@@ -28,70 +28,50 @@ ui <- fluidPage(theme = shinytheme("superhero"),
                            tabPanel("Referrals and Enrollments",
                                     h3("Referrals and Enrollments"),
                                       h4("Eligible per HMIS Data Pull"),
-                                      plotlyOutput("HMISplot"),
+                                        plotlyOutput("HMISplot"),
                                       h4("TRH Location Endeavors"),
-                                      plotlyOutput("TRHplot"),
+                                        plotlyOutput("TRHplot"),
                                       h4("Prescreens"),
-                                      plotlyOutput("PrescreenPlot"),
-                                    h4("Number of REACH Assessments Conducted"),
-                                    plotlyOutput("assessmentsBarPlot")
+                                        plotlyOutput("PrescreenPlot")
                            ), 
-                           tabPanel("Service Delivery",
-                                    h3("Service Delivery"),
-                                    h4("Number of Clients by Delivery Type"),
-                                    plotlyOutput("serviceDeliveryLinePlot"),
-                                    h4("Time Spent on Highest Needs of Client"),
-                                    plotlyOutput("highestNeedBarPlot") 
+                           tabPanel("Housing Placement and Services",
+                                    h3("Housing Placement and Services"),
+                                      h4("Roommate Placement Assessments Conducted"),
+                                        plotlyOutput("RPACplot"),
+                                    h3("Placements into Housing"),
+                                      h4("New Placements into Housing"),
+                                        plotlyOutput("NPiHplot"),
+                                      h4("Awaiting Housing"),
+                                        plotlyOutput("AHplot")
+                           ),
+                           tabPanel("Behavioral Health",
+                                    h3("Behavioral Health"),
+                                      h4("Referrals"),
+                                        plotlyOutput("ReferralsPlot"), 
+                                      h4("HNJ Clinician Statistics"),
+                                        plotlyOutput("CSplot"),
+                                      h4("Enrolled in Additional Community Services"),
+                                        plotlyOutput("EiACSplot")
                            ),
                            tabPanel("Employment",
                                     h3("Employment"),
-                                    h4("Client Engagement"),
-                                    plotlyOutput("employmentLinePlot"), 
-                                    h4("Total Percent of Employment"),
-                                    plotlyOutput("employmentBarPlot")
-                           ),
-                           tabPanel("Housing",
-                                    h3("Housing"),
-                                    h4("Client Numbers"),
-                                    plotlyOutput("housingResidentLinePlot"), 
-                                    h4("Average Length of Stay"),
-                                    plotlyOutput("housingCapacityLinePlotLength"), 
-                                    h4("Bed Days Filled"),
-                                    plotlyOutput("bedDaysLinePlot")
-                           ),
-                           tabPanel("SUD Treatment",
-                                    h3("SUD Treatment"),
-                                    h4("SUD Numbers"),
-                                    plotlyOutput("SUDLinePlot"), 
-                                    h4("SUD hourly breakdown"),
-                                    plotlyOutput("SUDBarPlot"),
-                                    h3("UA Treatment"),
-                                    h4("UA Numbers"),
-                                    plotlyOutput("UALinePlot"),
-                                    h4("UA Breakdown"),
-                                    plotlyOutput("UASLinePlot")
-                           ),
-                           tabPanel("Recidivism",
-                                    h3("Recidivism"),
-                                    h4("Engagements Number"),
-                                    plotlyOutput("engagementsLinePlot"), 
-                                    h4("Contacts to disengaged individuals"),
-                                    plotlyOutput("engagementsMethodsLinePlot")
+                                        plotlyOutput("EmploymentPlot")
                            ),
                            tabPanel("Staffing",
                                     h3("Staffing"),
-                                    plotlyOutput("staffingLinePlot")
-                           ),
-                           tabPanel("Fidelity and Training",
-                                    h3("Fidelity and Training"),
-                                    plotlyOutput("fidelityScoreLinePlot") 
+                                      h4("Staff to Client Ratio"),
+                                        plotlyOutput("StCRplot"),
+                                      h4("Staffing Positions"),
+                                        plotlyOutput("SPplot")
                            ),
                            tabPanel("Exits",
                                     h3("Exits"),
-                                    h4("Number of Exits"),
-                                    plotlyOutput("exitLinePlot"),
-                                    h4("Overall Attrition"),
-                                    plotlyOutput("exitAttritionLinePlot")
+                                      h4("Clients that Lost Housing"),
+                                        plotlyOutput("CtLHplot"),
+                                      h4("Unplanned Exits this Month"),
+                                        plotlyOutput("UEtMplot"),
+                                      h4("Planned Graduations"),
+                                        plotlyOutput("PGplot")
                            ),
                            tabPanel("Financial",
                                     h3("Financial Data"),
@@ -118,15 +98,23 @@ server <- function(input, output) {
     gs_read()
 
   ## Wrangling
-    tData <- t(myData) # transposes the data
-    tData <- as.data.frame(tData) # transforms the data into a dataframe
-    tData <- tData[ ,-c(1, 6, 7, 11, 16, 25, 29, 56, 63, 69, 77, 81, 84, 96)] # removes header columns
-    colnames(tData) <- as.character(unlist(tData[2,])) # assigns column names to second row
-    tData <- tData[-c(1, 2, 5, 9, 13, 16, 17, 18, 19, 20, 21, 22), ] # removes quarterly total and duplicate rows
-    xaxis <- rownames(tData) # assigns row names to a vector we can use in our graph
-    months <- factor(xaxis,levels = c("October", "November", "December", "January",  "February", "March",  "April", "May", "June",  "July", "August"))
+  tData <- t(myData) # transposes the data
+  tData <- as.data.frame(tData) # transforms the data into a dataframe
+  tData <- tData[ ,-c(1, 6, 7, 11, 16, 25, 29, 56, 63, 69, 77, 81, 84, 96)] # removes header columns
+  colnames(tData) <- as.character(unlist(tData[2,])) # assigns column names to second row
+  tData <- tData[-c(1, 2, 5, 9, 13, 16, 17, 18, 19, 20, 21, 22), ] # removes quarterly total and duplicate rows
+  xaxis <- rownames(tData) # assigns row names to a vector we can use in our graph
+  months <- factor(xaxis,levels = c("October", "November", "December", "January",  "February", "March",  "April", "May", "June",  "July", "August"))
+    ### Creating new Columns for Staffing Tab
+    staff <- c(NA, 7, 7, 7, 7, 7, 7, 7, 7, 7)
+    tData$Staff <- staff
+    clients <- c(NA, 61, 67, 67, 67, 95, 103, 113, 127, NA)
+    tData$Clients <- clients
+    PositionsAvailable <- c(NA, 0, 0, 0, 0, 0, 0, 0, 0, 1)
+    tData$PositionsAvailable <- PositionsAvailable
+    PositionsFilled <- c(NA, 7, 7, 7, 7, 7, 7, 7, 7, 8)
+    tData$PositionsFilled <- PositionsFilled
     
-  
   ## Graphics
     ### Program Overview
       #### Program Overview
@@ -159,129 +147,95 @@ server <- function(input, output) {
       #### Eligible per HMIS Data Pull
         ##### Eligible per HMIS Data Pull
         output$HMISplot <- renderPlotly({HMISplot <- plot_ly(x = months, y = strtoi(tData[,23]), type = 'bar', name = 'Eligible per HMIS Data Pull') %>%
-          layout(yaxis = list(title = 'Number of Individuals', rangemode = "tozero"), xaxis = list(title = 'Month'))
+        layout(yaxis = list(title = 'Number of Individuals', rangemode = "tozero"), xaxis = list(title = 'Month'))
         })
       #### TRH Location Endeavors
         ##### TRH Location Endeavors
-        output$TRHplot <- renderPlotly({TRHplot <- plot_ly(x = months, y = strtoi(tData[ ,24]), name = 'TRH Attempted to Locate', type = 'scatter', mode = 'lines+markers') %>%
-          add_trace(y = strtoi(tData[ ,25]), name = 'TRH Located', mode = 'lines+markers') %>%
+        output$TRHplot <- renderPlotly({TRHplot <- plot_ly(x = months, y = strtoi(tData[ ,24]), name = 'Attempted to Locate', type = 'scatter', mode = 'lines+markers') %>%
+          add_trace(y = strtoi(tData[ ,25]), name = 'Located and Prescreened', mode = 'lines+markers') %>%
         layout(yaxis = list(title = 'Number of Individuals'), xaxis = list(title = 'Month'))
         })
-      #### Prescreen 
-      output$PrescreenPlot <- renderPlotly({PrescreenPlot <- plot_ly(x = months, y = strtoi(tData[,29]), type = 'bar', name = 'Randomized into REACH') %>%
-      layout(yaxis = list(title = 'Avg. Contacts from Randomization to Enrollment', rangemode = "tozero"), xaxis = list(title = 'Month'))
-    })
-    output$assessmentsBarPlot <- renderPlotly({assessmentsBarPlot <- plot_ly(x = months, y = strtoi(tData[,30]), type = 'bar', name = 'Randomized into REACH') %>%
-      layout(yaxis = list(title = 'Assessments Conducted', rangemode = "tozero"), xaxis = list(title = 'Month'))
-    })
-    
-    # Service Delivery
-    output$serviceDeliveryLinePlot <- renderPlotly({serviceDeliveryLinePlot <- plot_ly(x = months, y = strtoi(tData[,31]), name = 'Intensive Treatment', type = 'scatter', mode = 'lines+markers')  %>%
-      add_trace(y = strtoi(tData[,32]), name = 'Transition', mode = 'lines+markers') %>%
-      add_trace(y = strtoi(tData[,33]), name = 'Sustained Recovery', mode = 'lines+markers') %>%
-      add_trace(y = strtoi(tData[,34]), name = 'Long-term Recovery', mode = 'lines+markers')%>%
-      add_trace(y = strtoi(tData[,35]), name = '200 Hours of Therapy', mode = 'lines+markers')%>%
-      add_trace(y = strtoi(tData[,37]), name = 'Completed MRT', mode = 'lines+markers')%>%
-      layout(yaxis = list(title = 'Number of Individuals Receiving', rangemode = "tozero"), xaxis = list(title = 'Month'))
-    })
-    
-    output$highestNeedBarPlot <- renderPlotly({ highestNeedBarPlot <- plot_ly(x = months, y = as.numeric(sub("%", "", tData[,36])), type = 'bar', name = 'Randomized into REACH') %>%
-      layout(yaxis = list(title = '% of Time Spent On Highest Priority', rangemode = "tozero"), xaxis = list(title = 'Month'))
-    })
-    
-    # Employment 
-    output$employmentLinePlot <- renderPlotly({employmentLinePlot <- plot_ly(x = months, y = strtoi(tData[,38]), name = 'Completed Assessment', type = 'scatter', mode = 'lines+markers')  %>%
-      add_trace(y = strtoi(tData[,39]), name = 'Obtained Employment ', mode = 'lines+markers') %>%
-      add_trace(y = strtoi(tData[,40]), name = 'Engaged With REACH Employment', mode = 'lines+markers') %>%
-      add_trace(y = strtoi(tData[,41]), name = 'Obtained a Job with DWS', mode = 'lines+markers')%>% #could error with ?
-      add_trace(y = strtoi(tData[,42]), name = 'Engaged with Vocational Training', mode = 'lines+markers')%>%
-      add_trace(y = strtoi(tData[,44]), name = 'Lost Their Job', mode = 'lines+markers')%>%
-      layout(yaxis = list(title = 'Number of Individuals', rangemode = "tozero"), xaxis = list(title = 'Month'))
-    })
-    output$employmentBarPlot <- renderPlotly({employmentBarPlot <- plot_ly(x = months, y = as.numeric(sub("%", "", tData[,43])), type = 'bar', name = 'REACH Clients') %>%
-      layout(yaxis = list(title = '% of REACH Clients Employed', rangemode = "tozero"), xaxis = list(title = 'Month'))
-    })
-    
-    
-    # Housing
-    output$housingResidentLinePlot <- renderPlotly({housingResidentLinePlot <- plot_ly(x = months, y = strtoi(tData[,45]), name = 'Completed Housing Assessments', type = 'scatter', mode = 'lines+markers')  %>%
-      add_trace(y = strtoi(tData[,45]), name = 'In Need of Residence', mode = 'lines+markers') %>%
-      add_trace(y = strtoi(tData[,46]), name = 'Placed in REACH Recovery Residence', mode = 'lines+markers') %>%
-      add_trace(y = strtoi(tData[,47]), name = 'Currently Housed in REACH Recovery', mode = 'lines+markers')%>% #could error with ?
-      add_trace(y = strtoi(tData[,49]), name = 'Unique Clients served in REACH Recovery', mode = 'lines+markers')%>%
+      #### Prescreen
+        ##### Prescreen
+        output$PrescreenPlot <- renderPlotly({PrescreenPlot <- plot_ly(x = months, y = strtoi(tData[,26]), type = 'bar', name = 'Eligible for Prescreen') %>%
+        layout(yaxis = list(title = 'Individuals Eligible for Prescreen', rangemode = "tozero"), xaxis = list(title = 'Month'))
+        })
+        
+    ### Housing Placement and Services
+      #### Roommate Placement Assessments Conducted
+        ##### Roommate Placement Assessments Conducted
+        output$RPACplot <- renderPlotly({RPACplot <- plot_ly(x = months, y = strtoi(tData[,49]), type = 'bar', name = 'Roommate Placement Assessments Conducted')  %>%
+        layout(yaxis = list(title = 'Number of Individuals', rangemode = "tozero"), xaxis = list(title = 'Month'))
+        })
+      #### Placements into Housing
+        ##### New Placements into Housing
+        output$NPiHplot <- renderPlotly({NPiHplot <- plot_ly(x = months, y = strtoi(tData[ ,50]), name = 'Total', type = 'scatter', mode = 'lines+markers') %>%
+          add_trace(y = strtoi(tData[ ,51]), name = 'Single Occupancy Housing', mode = 'lines+markers') %>%
+          add_trace(y = strtoi(tData[ ,52]), name = 'Roommate Housing', mode = 'lines+markers') %>%
+        layout(yaxis = list(title = 'Number of Individuals'), xaxis = list(title = 'Month'))
+        })
+        ##### Awaiting Housing
+        output$AHplot <- renderPlotly({AHplot <- plot_ly(x = months, y = strtoi(tData[ ,53]), name = 'Awaiting Housing Placement', type = 'scatter', mode = 'lines+markers') %>%
+          add_trace(y = strtoi(tData[ ,54]), name = 'Not Housed within Three Months of Enrollment', mode = 'lines+markers') %>%
+        layout(yaxis = list(title = 'Number of Individuals'), xaxis = list(title = 'Month'))
+        })
+    ### Behavioral Health
+      #### Behavioral Health
+        #### Referrals
+        output$ReferralsPlot <- renderPlotly({ReferralsPlot <- plot_ly(x = months, y = strtoi(tData[,60]), name = 'Referred to BH Treatment', type = 'scatter', mode = 'lines+markers')  %>%
+          add_trace(y = strtoi(tData[,62]), name = 'Referred to BH Treatment after HNJ Assessment ', mode = 'lines+markers') %>%
+        layout(yaxis = list(title = 'Number of Individuals', rangemode = "tozero"), xaxis = list(title = 'Month'))
+        })
+        #### HNJ Clinician Statistics
+        output$CSplot <- renderPlotly({CSplot <- plot_ly(x = months, y = strtoi(tData[,61]), name = 'HNJ Health Assessments Conducted', type = 'scatter', mode = 'lines+markers')  %>%
+          add_trace(y = strtoi(tData[,63]), name = 'Met with HNJ Clinician', mode = 'lines+markers') %>%
+        layout(yaxis = list(title = 'Number of Individuals', rangemode = "tozero"), xaxis = list(title = 'Month'))
+        })
+        #### Enrolled in Additional Community Services
+        output$EiACSplot <- renderPlotly({EiACSplot <- plot_ly(x = months, y = strtoi(tData[,64]), name = 'Total', type = 'scatter', mode = 'lines+markers')  %>%
+          add_trace(y = strtoi(tData[,65]), name = 'SUD', mode = 'lines+markers') %>%
+          add_trace(y = strtoi(tData[,66]), name = 'Behavioral', mode = 'lines+markers') %>%
+        layout(yaxis = list(title = 'Number of Individuals', rangemode = "tozero"), xaxis = list(title = 'Month'))
+        })
+    ### Employment
+      #### Employment  
+      output$EmploymentPlot <- renderPlotly({EmploymentPlot <- plot_ly(x = months, y = strtoi(tData[,67]), name = 'Employment Assessments Conducted', type = 'scatter', mode = 'lines+markers')  %>%
+        add_trace(y = strtoi(tData[,68]), name = 'Enrolled in Employment Services', mode = 'lines+markers') %>%
+        add_trace(y = strtoi(tData[,69]), name = 'Participants with Source of Income', mode = 'lines+markers') %>%
       layout(yaxis = list(title = 'Number of Clients', rangemode = "tozero"), xaxis = list(title = 'Month', ax))
-    })
-    output$housingCapacityLinePlotLength <- renderPlotly({ housingCapacityLinePlot <- plot_ly(x = months, y = strtoi(tData[,48]), name = 'Average Length of Stay', type = 'scatter', mode = 'lines+markers')  %>%
-      layout(yaxis = list(title = 'Days', rangemode = "tozero"), xaxis = list(title = 'Month'))
-    })
-    output$bedDaysLinePlot <- renderPlotly({bedDaysLinePlot <- plot_ly(x = months, y = as.numeric(sub("%", "", tData[,50])), name = 'In Residence', type = 'scatter', mode = 'lines+markers')  %>%
-      add_trace(y = as.numeric(sub("%", "", tData[,51])), name = 'By Transitional', mode = 'lines+markers') %>%
-      layout(yaxis = list(title = '% of Bed Days Filled', rangemode = "tozero"), xaxis = list(title = 'Month'))
-    })
-    
-    # SUD treatment
-    output$SUDLinePlot <- renderPlotly({ SUDLinePlot <- plot_ly(x = months, y = strtoi(tData[,53]), name = 'SUD', type = 'scatter', mode = 'lines+markers')  %>%
-      layout(yaxis = list(title = 'Number Completed', rangemode = "tozero"), xaxis = list(title = 'Month'))
-    })
-    
-    output$UALinePlot <- renderPlotly({ SUDLinePlot <- plot_ly(x = months, y = strtoi(tData[,54]), name = 'UA', type = 'scatter', mode = 'lines+markers')  %>%
-      layout(yaxis = list(title = 'Number Completed', rangemode = "tozero"), xaxis = list(title = 'Month'))
-    })
-    
-    output$UASLinePlot <- renderPlotly({UASLinePlot <- plot_ly(x = months, y = as.numeric(sub("%", "", tData[,55])), name = 'Positive', type = 'scatter', mode = 'lines+markers')  %>%
-      add_trace(y = as.numeric(sub("%", "", tData[,56])), name = 'No-show', mode = 'lines+markers') %>%
-      layout(yaxis = list(title = 'Percent (%)', rangemode = "tozero"), xaxis = list(title = 'Month'))
-    })
-    
-    output$SUDBarPlot <- renderPlotly({SUDBarPlot <- plot_ly(x = months, y = as.double(sub("%", "", tData[,57]))/100, type = 'bar', name = 'REACH Clients') %>% #divide by 100 as hours are entered as a percentage
-      layout(yaxis = list(title = 'Average Number of Hours Per Client', rangemode = "tozero"), xaxis = list(title = 'Month'))
-    })
-    
-    # Recidivism 
-    output$engagementsLinePlot <- renderPlotly({engagementsLinePlot <- plot_ly(x = months, y = strtoi(tData[,58]), name = 'Post-Incarceration Re-engagements', type = 'scatter', mode = 'lines+markers')  %>%
-      add_trace(y = strtoi(tData[,55]), name = 'Successful Re-engagements', mode = 'lines+markers') %>%
-      add_trace(y = strtoi(tData[,55]), name = 'Left Unsuccessfully', mode = 'lines+markers') %>%
-      layout(yaxis = list(title = 'Number Completed', rangemode = "tozero"), xaxis = list(title = 'Month'))
-    })
-    output$engagementsMethodsLinePlot <- renderPlotly({engagementsMethodsLinePlot <- plot_ly(x = months, y = as.double(tData[,59]), name = 'Avg. Days Between Jail and Re-enrollment', type = 'scatter', mode = 'lines+markers')  %>%
-      add_trace(y = as.double(tData[,60]), name = 'Contact Attempts', mode = 'lines+markers') %>%
-      layout(yaxis = list(title = 'Number', rangemode = "tozero"), xaxis = list(title = 'Month'))
-    })
-    
-    #Staffing 
-    output$staffingLinePlot <- renderPlotly({staffingLinePlot <- plot_ly(x = months, y = strtoi(tData[,62]), name = 'Case Managers', type = 'scatter', mode = 'lines+markers')  %>%
-      add_trace(y = strtoi(tData[,63]), name = 'Mentors', mode = 'lines+markers') %>%
-      add_trace(y = strtoi(tData[,64]), name = 'Program Managers', mode = 'lines+markers') %>%
-      add_trace(y = strtoi(tData[,65]), name = 'Admission Coordinators', mode = 'lines+markers') %>%
-      add_trace(y = strtoi(tData[,66]), name = 'Therapists', mode = 'lines+markers') %>%
-      layout(yaxis = list(title = 'Number on Staff', rangemode = "tozero"), xaxis = list(title = 'Month'))
-    })
-    
-    #Fidelity 
-    output$fidelityScoreLinePlot <- renderPlotly({fidelityScoreLinePlot <- plot_ly(x = months, y = as.numeric(sub("%", "", tData[,67])), name = 'Staff Trained In Modalities', type = 'scatter', mode = 'lines+markers')  %>%
-      add_trace(y = as.numeric(sub("%", "", tData[,78])), name = 'MRT groups with Supervision', mode = 'lines+markers') %>%
-      add_trace(y = as.numeric(sub("%", "", tData[,69])), name = 'Clinicians Receiving Fidelity Checks', mode = 'lines+markers') %>%
-      add_trace(y = as.numeric(sub("%", "", tData[,70])), name = 'Fidelity Score for MRT', mode = 'lines+markers') %>%
-      add_trace(y = as.numeric(sub("%", "", tData[,71])), name = 'Fidelity Score for MI', mode = 'lines+markers') %>%
-      add_trace(y = as.numeric(sub("%", "", tData[,72])), name = 'Fidelity Score for TA', mode = 'lines+markers') %>%
-      layout(yaxis = list(title = 'Percent (%)', rangemode = "tozero"), xaxis = list(title = 'Month'))
-    })
-    
-    #Exits 
-    output$exitLinePlot <- renderPlotly({exitLinePlot <- plot_ly(x = months, y = strtoi(tData[,73]), name = 'Total Unplanned Exits', type = 'scatter', mode = 'lines+markers')  %>%
-      add_trace(y = strtoi(tData[,74]), name = 'Jail', mode = 'lines+markers') %>%
-      add_trace(y = strtoi(tData[,75]), name = 'Prison', mode = 'lines+markers') %>%
-      add_trace(y = strtoi(tData[,76]), name = 'Self Termination', mode = 'lines+markers') %>%
-      add_trace(y = strtoi(tData[,77]), name = 'No Contact', mode = 'lines+markers') %>%
-      add_trace(y = strtoi(tData[,78]), name = 'Total Terminated by FSH', mode = 'lines+markers') %>%
-      add_trace(y = strtoi(tData[,79]), name = 'Deceased', mode = 'lines+markers') %>%
-      add_trace(y = strtoi(tData[,80]), name = 'Transfered Programs', mode = 'lines+markers') %>%
-      add_trace(y = strtoi(tData[,82]), name = 'Planned Exits', mode = 'lines+markers') %>%
+      })
+    ### Staffing
+      #### Staff to Client Ratio
+      output$StCRplot <- renderPlotly({StCRplot <- plot_ly(x = months, y = strtoi(tData[,84]), name = 'Staff', type = 'scatter', mode = 'lines+markers')  %>%
+        add_trace(y = strtoi(tData[,85]), name = 'Clients', mode = 'lines+markers') %>%
+      layout(yaxis = list(title = 'Number of Individuals', rangemode = "tozero"), xaxis = list(title = 'Month', ax))
+      })
+      #### Staffing Positions
+      output$SPplot <- renderPlotly({SPplot <- plot_ly(x = months, y = strtoi(tData[,86]), name = 'Positions Available', type = 'scatter', mode = 'lines+markers')  %>%
+        add_trace(y = strtoi(tData[,87]), name = 'Positions Filled', mode = 'lines+markers') %>%
+        layout(yaxis = list(title = 'Number of Individuals', rangemode = "tozero"), xaxis = list(title = 'Month', ax))
+      })
+    ### Exits
+      #### Clients that Lost Housing this Month
+      output$CtLHplot <- renderPlotly({CtLHplot <- plot_ly(x = months, y = strtoi(tData[,72]), name = 'Total', type = 'scatter', mode = 'lines+markers')  %>%
+        add_trace(y = strtoi(tData[,73]), name = 'Eviction', mode = 'lines+markers') %>%
+        add_trace(y = strtoi(tData[,74]), name = 'Other', mode = 'lines+markers') %>%
       layout(yaxis = list(title = 'Number of Clients that Exitted', rangemode = "tozero"), xaxis = list(title = 'Month'))
-    })
-    output$exitAttritionLinePlot <- renderPlotly({exitAttritionLinePlot <- plot_ly(x = months, y = as.numeric(sub("%", "", tData[,81])), name = 'Attrition', type = 'scatter', mode = 'lines+markers')  %>%
-      layout(yaxis = list(title = 'Percent (%)', rangemode = "tozero"), xaxis = list(title = 'Month'))
-    })
+      })
+      #### Unplanned Exits this Month
+      output$UEtMplot <- renderPlotly({UEtMplot <- plot_ly(x = months, y = strtoi(tData[75]), name = 'Total Unplanned Exits', type = 'scatter', mode = 'lines+markers')  %>%
+        add_trace(y = strtoi(tData[,76]), name = 'Jail/Prison', mode = 'lines+markers') %>%
+        add_trace(y = strtoi(tData[,77]), name = 'Self-Termination', mode = 'lines+markers') %>%
+        add_trace(y = strtoi(tData[,78]), name = 'Left without Contact', mode = 'lines+markers') %>%
+        add_trace(y = strtoi(tData[,79]), name = 'Deceased', mode = 'lines+markers') %>%
+        add_trace(y = strtoi(tData[,80]), name = 'Transfer to Another Program', mode = 'lines+markers') %>%
+        add_trace(y = strtoi(tData[,81]), name = 'Other', mode = 'lines+markers') %>%
+      layout(yaxis = list(title = 'Number of Clients that Exitted', rangemode = "tozero"), xaxis = list(title = 'Month'))
+      })
+      #### Planned Graduations
+      output$PGplot <- renderPlotly({PGplot <- plot_ly(x = months, y = strtoi(tData[,82]), type = 'bar', name = 'Planned Graduations') %>%
+        layout(yaxis = list(title = 'Number of Individuals', rangemode = "tozero"), xaxis = list(title = 'Month'))
+      })
     
     #Finances
     output$financesLinePlot <- renderPlotly({financesLinePlot <- plot_ly(x = months, y = as.double(tData[,83]), name = 'Finances', type = 'scatter', mode = 'lines+markers')  %>%
