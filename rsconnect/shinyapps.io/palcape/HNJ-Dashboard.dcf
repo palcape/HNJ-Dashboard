@@ -1,0 +1,12 @@
+name: HNJ-Dashboard
+title: HNJ-Dashboard
+username:
+account: palcape
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 519611
+bundleId: 1648073
+url: https://palcape.shinyapps.io/HNJ-Dashboard/
+when: 1539796710.13514
+asMultiple: FALSE
+asStatic: FALSE

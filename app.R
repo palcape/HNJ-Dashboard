@@ -71,7 +71,7 @@ ui <- fluidPage(theme = shinytheme("superhero"),
                                     h3("Exits"),
                                       h4("Clients that Lost Housing"),
                                         plotlyOutput("CtLHplot"),
-                                      h4("Unplanned Exits this Month"),
+                                      h4("Unplanned Exits"),
                                         plotlyOutput("UEtMplot"),
                                       h4("Planned Graduations"),
                                         plotlyOutput("PGplot")
@@ -124,6 +124,10 @@ server <- function(input, output) {
         })
     ### Client Demographics
       #### Gender
+        output$GenderPlot <- renderPlotly({GenderPlot <- plot_ly(x = months, y = strtoi(tData[ ,5]), name = 'Male', type = 'scatter', mode = 'lines+markers')  %>%
+          add_trace(y = strtoi(tData[ ,6]), name = 'Female', mode = 'lines+markers')%>%
+          layout(yaxis = list(title = 'Number of Individuals', rangemode = "tozero"), xaxis = list(title = 'Month'))
+        })
       #### Age 
         output$AgesLinePlot <- renderPlotly({AgesLinePlot <- plot_ly(x = months, y = strtoi(tData[ ,9]), name = '26-35', type = 'scatter', mode = 'lines+markers')  %>%
           add_trace(y = strtoi(tData[ ,10]), name = '36-45', mode = 'lines+markers')%>%
